@@ -143,10 +143,15 @@ public class DifFunction implements Function<APIGatewayProxyRequestEvent, APIGat
 	private DistributorEntity populateEntity(com.cts.poc.dif.model.Distributor distributorModel) {
 		DistributorEntity distributorEntity = new DistributorEntity();
 		distributorEntity.setDistributor_id(distributorModel.getDistributor_id());
+		distributorEntity.setFsma_status(distributorModel.getFsma_status());
+		distributorEntity.setAxa_distributor_status(distributorModel.getAxa_distributor_status());
+		distributorEntity.setOrganization_type(distributorModel.getOrganization_type());
+		distributorEntity.setContract_type(distributorModel.getContract_type());
 		distributorEntity.setProcess_manager_identifier(distributorModel.getProcess_manager_identifier());
 		distributorEntity.setName(distributorModel.getName());
 		distributorEntity.setEstablishment_date(new Date());
 		distributorEntity.setEnterprise_number(distributorModel.getEnterprise_number());
+		distributorEntity.setLineofbusiness(distributorModel.getLineofbusiness());
 		// distributorEntity.setLvf(null != distributorModel.getLvf() ?
 		// distributorModel.getLvf().charAt(0) : null);
 
@@ -155,14 +160,22 @@ public class DifFunction implements Function<APIGatewayProxyRequestEvent, APIGat
 			ConventionEntity conventionEntity = new ConventionEntity();
 			conventionEntity.setConvention_id(convention.getConvention_id());
 			conventionEntity.setProcess_manager_identifier(convention.getProcess_manager_identifier());
+			conventionEntity.setSegment_type(convention.getSegment_type());
 			conventionEntity.setCreated_by(convention.getCreated_by());
+			conventionEntity.setCreated_date(new Date());
+			conventionEntity.setModified_by(convention.getModified_by());
+			conventionEntity.setModified_date(new Date());
+			conventionEntity.setValid_from(new Date());
+			conventionEntity.setValid_to(new Date());
 
 			Set<com.cts.poc.dif.entity.ProcessSetupEntity> processSetupEntitySet = new HashSet<>();
 			convention.getProcess().forEach(process -> {
 				ProcessSetupEntity processSetupEntity = new ProcessSetupEntity();
 				processSetupEntity.setProcess_id(process.getProcess_id());
+				processSetupEntity.setSubprocess(process.getSubprocess());
 				processSetupEntity.setProcess_manager_identifier(process.getProcess_manager_identifier());
 				processSetupEntity.setStatus(process.getStatus());
+				processSetupEntity.setCreate_date(new Date());
 				processSetupEntitySet.add(processSetupEntity);
 			});
 			conventionEntity.setProcess(processSetupEntitySet);
@@ -178,14 +191,23 @@ public class DifFunction implements Function<APIGatewayProxyRequestEvent, APIGat
 			employeeEntity.setFirst_name(employee.getFirst_name());
 			employeeEntity.setLast_name(employee.getLast_name());
 			employeeEntity.setLvf(null != employee.getLvf() ? employee.getLvf().charAt(0) : null);
-
+			employeeEntity.setGender(null != employee.getGender() ? employee.getGender().charAt(0) : null);
+			employeeEntity.setNationality(employee.getNationality());
+			employeeEntity.setActivity_type(employee.getActivity_type());
+			employeeEntity.setSpecialization_type(employee.getSpecialization_type());
+			employeeEntity.setNi_number(employee.getNi_number());
+			employeeEntity.setBehavior_type(employee.getBehavior_type());
+			employeeEntity.setCertification(employee.getCertification());
+			employeeEntity
+					.setManager_id(null != employee.getManager_id() ? Integer.valueOf(employee.getManager_id()) : null);
+			employeeEntity.setHierarchy_type(employee.getHierarchy_type());
 			employeeEntitySet.add(employeeEntity);
 		});
 		distributorEntity.setEmployee(employeeEntitySet);
 
 		return distributorEntity;
 	}
-	
+
 	private void addCorsHeader(APIGatewayProxyResponseEvent responseEvent) {
 		Map<String, String> header = responseEvent.getHeaders();
 		if (null != header) {
@@ -197,7 +219,7 @@ public class DifFunction implements Function<APIGatewayProxyRequestEvent, APIGat
 			responseEvent.setHeaders(header);
 		}
 	}
-	
+
 	private void setCorsHeader(Map<String, String> header) {
 		header.put("Access-Control-Allow-Headers", "Content-Type");
 		header.put("Access-Control-Allow-Origin", "*");
